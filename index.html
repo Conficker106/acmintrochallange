@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ACM CYS — Cyber Escape Room (Beginner)</title>
+  <style>
+    :root {
+      --bg: #0b2016;
+      --panel: #425c57b2;
+      --accent: #00ff26;
+      --accent-2: #329ed0;
+      --text: #e9ebff;
+      --muted: #9aa3c7;
+      --danger: #ff6b6b;
+      --success: #2bd17e;
+    }
+    * { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+    Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: url('acmlogopng.png') no-repeat center center fixed;
+  background-size: contain; /* Fit entire logo inside screen */
+  background-color: #0a0f0a; /* fallback background color */
+  color: var(--text);
+}
+
+    /* body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+    Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(circle at top left, #0cc980 0%, var(--bg) 60%, #071206 100%) no-repeat fixed;
+  background-size: cover;
+  color: var(--text);
+} */
+
+    header {
+      padding: 28px 18px 10px;
+      text-align: center;
+    }
+    .title {
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      font-size: clamp(22px, 3.5vw, 34px);
+    }
+    .subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: clamp(13px, 2vw, 16px);
+    }
+    .container {
+      max-width: 920px;
+      margin: 12px auto 40px;
+      padding: 0 16px 24px;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .hero {
+      padding: 18px 18px 6px;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+    }
+    @media (max-width: 840px){
+      .hero-inner { grid-template-columns: 1fr; }
+    }
+    .hero .card { padding: 18px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .badges { display:flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 10px; }
+    .badge {
+      font-size: 12px; color: #dfe2ff; background: rgba(124,92,255,0.15);
+      border: 1px solid rgba(124,92,255,0.35);
+      padding: 6px 10px; border-radius: 999px;
+    }
+    .controls { display:flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    button, .btn {
+      background: linear-gradient(180deg, var(--accent), #57ef76);
+      color: white; border: none; border-radius: 12px; padding: 10px 14px; font-weight: 700;
+      letter-spacing: .2px; cursor: pointer; transition: transform .08s ease, filter .2s ease;
+    }
+    button.secondary { background: linear-gradient(180deg, #2abe6f, #1d4f43); color: #dbe0ff; }
+    button.ghost { background: transparent; border: 1px solid rgba(255,255,255,.15); color: #cdd3ff; }
+    button:active { transform: translateY(1px); }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 840px){ .grid { grid-template-columns: 1fr; } }
+
+    .progress {
+      height: 10px; background: #2c2f38; border: 1px solid rgba(255,255,255,.08);
+      border-radius: 999px; overflow: hidden;
+    }
+    .progress > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0; transition: width .4s ease; }
+
+    .puzzle { padding: 18px; }
+    .puzzle h3 { margin: 0 0 6px; font-size: 18px; }
+    .puzzle p { margin: 6px 0 12px; color: var(--muted); }
+    .field {
+      display:flex; gap: 10px; flex-wrap: wrap;
+    }
+    input[type="text"] {
+      background: #2c2f38; color: var(--text); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px; padding: 10px 12px; min-width: 220px; flex: 1; outline: none;
+    }
+    .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .msg { margin-top: 8px; font-weight: 700; }
+    .msg.ok { color: var(--success); }
+    .msg.err { color: var(--danger); }
+
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 18px; }
+    .tiny { font-size: 11px; color: #8aa1ff; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">🔐 ACM CYS — Cyber Escape Room (Beginner)</div>
+    <div class="subtitle">Solve bite‑sized cyber puzzles to escape. Team up or go solo. No prior experience needed!</div>
+  </header>
+
+  <div class="container">
+    <section class="hero panel">
+      <div class="hero-inner">
+        <div class="card">
+          <div class="badges">
+            <span class="badge">Beginner‑friendly</span>
+            <span class="badge">20–30 min</span>
+            <span class="badge">Solo or Teams (2–4)</span>
+          </div>
+          <div class="progress" aria-label="progress">
+            <div id="bar"></div>
+          </div>
+          <div class="controls">
+            <button id="startBtn">▶ Start Game</button>
+            <button id="resetBtn" class="secondary">↺ Reset</button>
+            <button id="howBtn" class="ghost">ℹ How it works</button>
+            <span id="timer" class="tiny"></span>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Rules & Tips</h3>
+          <ul style="margin:8px 0 0 18px; color: var(--muted); line-height:1.5">
+            <li>Each puzzle unlocks the next. Answers are not case sensitive.</li>
+            <li>You can ask for a <b>Hint</b>, but it adds +30s penalty.</li>
+            <li>When you finish, a final <b>FLAG{...}</b> appears — submit this to the desk to claim goodies 😄</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="puzzles" class="panel" style="margin-top:16px;">
+      <div id="pList" class="grid"></div>
+      <div id="finish" class="hidden" style="padding: 18px;">
+        <div class="card" style="text-align:center">
+          <h2 style="margin:6px 0 12px">🏁 Escaped!</h2>
+          <p class="subtitle">Great job! Show this flag to the organizers:</p>
+          <div id="flag" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background:#0d1533; border:1px solid rgba(255,255,255,.1); padding:12px; border-radius:12px; display:inline-block; font-weight:800; letter-spacing:.6px"></div>
+          <p class="note">(Pro tip: Take a photo or copy it.)</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Built for ACM CYS Introductory Session • You can duplicate this file and swap puzzles for future events.
+    </footer>
+  </div>
+
+  <!-- 👀 Pssst… sometimes answers hide in plain sight. Developer tools and page source are your friends. -->
+  <!-- final-key: STAGECLEAR -->
+  <!-- event-code: ACMCYS25 -->
+  <script>
+    // --- Configurable Puzzles (edit text/answers to customize the event) ---
+    const PUZZLES = [
+      {
+        id: 1,
+        title: "Puzzle 1 — Hex to Text",
+        prompt: `Convert this ASCII hex into text (spaces separate bytes):\n<b>43 59 42 45 52</b>` ,
+        placeholder: "Your answer (e.g., HELLO)",
+        hint: "Each pair is a byte. 0x41 = 'A'.",
+        validate: (val) => val.trim().toUpperCase() === "CYBER",
+        answerKey: "CYBER"
+      },
+      {
+        id: 2,
+        title: "Puzzle 2 — Caesar Shift (+3)",
+        prompt: `Julius loved shifting letters. Decode this with a shift of +3 back to plain text:\n<b>FBRXQWGRZQ</b>` ,
+        placeholder: "Decoded word",
+        hint: "Shift each letter 3 back: F→C, B→Y, ...",
+        validate: (val) => val.trim().toUpperCase() === "COUNTDOWN",
+        answerKey: "COUNTDOWN"
+      },
+      {
+        id: 3,
+        title: "Puzzle 3 — Base64",
+        prompt: `Decode this Base64 string:\n<b>QUNNX0NZUw==</b>`,
+        placeholder: "Decoded text",
+        hint: "Web devs use atob()/btoa().",
+        validate: (val) => val.trim().toUpperCase() === "ACM_CYS",
+        answerKey: "ACM_CYS"
+      },
+      {
+        id: 4,
+        title: "Puzzle 4 — Source Sleuth",
+        prompt: `Some secrets are commented out where users don't usually look… Find the hidden <i>final key</i> in this page's source and type it here.`,
+        placeholder: "final key (e.g., STAGECLEAR)",
+        hint: "Right‑click → View Page Source. Search for 'final-key'.",
+        validate: (val) => val.trim().toUpperCase() === "STAGECLEAR",
+        answerKey: "STAGECLEAR"
+      }
+    ];
+
+    // --- Game State ---
+    let started = false;
+    let solvedCount = 0;
+    let penaltySeconds = 0;
+    let startTime = 0;
+    const bar = document.getElementById('bar');
+    const pList = document.getElementById('pList');
+    const finish = document.getElementById('finish');
+    const flagEl = document.getElementById('flag');
+    const timerEl = document.getElementById('timer');
+
+    function updateProgress(){
+      const pct = Math.round((solvedCount / PUZZLES.length) * 100);
+      bar.style.width = pct + '%';
+      if (pct === 100) showFlag();
+    }
+
+    function msToClock(ms){
+      const total = Math.max(0, Math.floor(ms/1000));
+      const s = (total % 60).toString().padStart(2,'0');
+      const m = Math.floor(total/60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    function tick(){
+      if (!started) return;
+      const now = Date.now();
+      const elapsed = now - startTime + (penaltySeconds*1000);
+      timerEl.textContent = `Time: ${msToClock(elapsed)}  (+${penaltySeconds}s)`;
+      requestAnimationFrame(tick);
+    }
+
+    function buildPuzzleCard(pz, index){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'puzzle card';
+      wrapper.dataset.index = index;
+
+      wrapper.innerHTML = `
+        <h3>${pz.title}</h3>
+        <p>${pz.prompt}</p>
+        <div class="field">
+          <input type="text" placeholder="${pz.placeholder}" aria-label="answer" />
+          <button class="btn" data-action="submit">Submit</button>
+          <button class="secondary" data-action="hint">Hint (+30s)</button>
+        </div>
+        <div class="note">Status: <span class="status">Locked</span></div>
+        <div class="msg"></div>
+      `;
+
+      const input = wrapper.querySelector('input');
+      const btnSubmit = wrapper.querySelector('[data-action="submit"]');
+      const btnHint = wrapper.querySelector('[data-action="hint"]');
+      const status = wrapper.querySelector('.status');
+      const msg = wrapper.querySelector('.msg');
+
+      function lockState(active){
+        input.disabled = !active; btnSubmit.disabled = !active; btnHint.disabled = !active;
+        status.textContent = active ? (index===0? 'Ready' : 'Unlocked') : 'Locked';
+        status.style.color = active ? '#a7f3d0' : '#9aa3c7';
+      }
+
+      function markSolved(){
+        wrapper.classList.add('solved');
+        status.textContent = 'Solved';
+        status.style.color = '#2bd17e';
+        input.disabled = true; btnSubmit.disabled = true; btnHint.disabled = true;
+      }
+
+      btnSubmit.addEventListener('click', () => {
+        const val = input.value || '';
+        if (pz.validate(val)){
+          msg.textContent = '✔ Correct!'; msg.className = 'msg ok';
+          markSolved();
+          solvedCount++;
+          updateProgress();
+          // unlock next card
+          const next = wrapper.nextElementSibling;
+          if (next) {
+            next.querySelector('input').disabled = false;
+            next.querySelector('[data-action="submit"]').disabled = false;
+            next.querySelector('[data-action="hint"]').disabled = false;
+            next.querySelector('.status').textContent = 'Unlocked';
+            next.querySelector('.status').style.color = '#a7f3d0';
+            next.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+        } else {
+          msg.textContent = '✖ Try again'; msg.className = 'msg err';
+        }
+      });
+
+      btnHint.addEventListener('click', ()=>{
+        penaltySeconds += 30;
+        alert('Hint: ' + pz.hint);
+      });
+
+      // Initially only the first is enabled.
+      lockState(index === 0);
+      return wrapper;
+    }
+
+    function renderPuzzles(){
+      // (re)build puzzle cards
+      pList.innerHTML = '';
+      PUZZLES.forEach((pz, i)=> pList.appendChild(buildPuzzleCard(pz, i)));
+    }
+
+    function showFlag(){
+      finish.classList.remove('hidden');
+      const parts = PUZZLES.map(p => p.answerKey.toUpperCase());
+      const final = `FLAG{${parts.join('-')}}`;
+      flagEl.textContent = final;
+      finish.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    function startGame(){
+      if (started) return;
+      started = true; solvedCount = 0; penaltySeconds = 0; startTime = Date.now();
+      document.getElementById('finish').classList.add('hidden');
+      renderPuzzles(); updateProgress(); tick();
+    }
+
+    function resetGame(){
+      started = false; solvedCount = 0; penaltySeconds = 0; startTime = 0;
+      bar.style.width = '0%'; timerEl.textContent = '';
+      pList.innerHTML = '';
+      finish.classList.add('hidden');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+    document.getElementById('howBtn').addEventListener('click', ()=>{
+      alert(`How it works:\n\n• Click Start Game.\n• Solve each puzzle to unlock the next.\n• Use Hint if stuck (+30s).\n• Finish to reveal the final FLAG.`);
+    });
+
+    // Optional: auto-start for quick demos
+    // startGame();
+  </script>
+</body>
+</html>
